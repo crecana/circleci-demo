@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+
+    working_directory: ~/cam-prometheus-demo
+
+    docker:
+      - image: circleci/jdk8
+
+    steps:
+
+      - checkout
+
+      - restore_cache:
+          key: cam-prometheus-demo-{{ checksum "pom.xml" }}
+
+      - run: mvn dependency:go-offline
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: cam-prometheus-demo-{{ checksum "pom.xml" }}
+
+      - run: mvn package
+
+      - store_test_results:
+          path: target/surefire-reports
+
+      - store_artifacts:
+          path: target/cam-prometheus-demo-0.0.1-SNAPSHOT.jar
