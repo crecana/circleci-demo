@@ -1,27 +1,30 @@
 version: 2
 jobs:
   build:
+
+    working_directory: ~/circleci-demo
+
     docker:
-      - image: circleci/jdk8:0.1.1
-
-    working_directory: ~/repo
-
-    environment:
-      MAVEN_OPTS: -Xmx3200m
+      - image: circleci/openjdk:8-jdk-browsers
 
     steps:
+
       - checkout
 
       - restore_cache:
-          keys:
-          - cam-prometheus-demo-{{ checksum "pom.xml" }}
-          - cam-prometheus-demo-
+          key: circleci-demo-{{ checksum "pom.xml" }}
 
       - run: mvn dependency:go-offline
 
       - save_cache:
           paths:
             - ~/.m2
-          key: cam-prometheus-demo-{{ checksum "pom.xml" }}
+          key: circleci-demo-{{ checksum "pom.xml" }}
 
-      - run: mvn integration-test
+      - run: mvn package
+
+      - store_test_results:
+          path: target/surefire-reports
+
+      - store_artifacts:
+          path: target/cam-prometheus-demo-0.0.1-SNAPSHOT.jar
