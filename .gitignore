@@ -3,5 +3,5 @@
 *.iml
 *.ipr
 target
-target/*
+
 
